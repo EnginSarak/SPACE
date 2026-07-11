@@ -1,7 +1,7 @@
 <div align="center">
 
-<img src="frontend/public/Logo_Light_Mode.svg#gh-light-mode-only" alt="Promedia Space" height="60"/>
-<img src="frontend/public/Logo_Dark_Mode.svg#gh-dark-mode-only" alt="Promedia Space" height="60"/>
+<img src="public/Logo_Light_Mode.svg#gh-light-mode-only" alt="Promedia Space" height="60"/>
+<img src="public/Logo_Dark_Mode.svg#gh-dark-mode-only" alt="Promedia Space" height="60"/>
 
 # PROMEDIA SPACE
 
@@ -61,7 +61,7 @@ Access is token-based (no user accounts or login forms)
 ## Preview
 
 <div align="center">
-  <img src="frontend/public/preview.png" alt="Promedia Space Dashboard Preview" width="100%"/>
+  <img src="public/preview.png" alt="Promedia Space Dashboard Preview" width="100%"/>
 </div>
 
 ---
