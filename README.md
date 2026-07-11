@@ -54,8 +54,6 @@ The tool is designed for daily use by logistics coordinators and inventory owner
 - Plan ahead using the Forecast mode to preview future capacity
 - Manage customs export document workflows via the integrated Task List
 
-Access is token-based (no user accounts or login forms)
-
 ---
 
 ## Preview
