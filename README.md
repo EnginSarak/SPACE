@@ -29,10 +29,13 @@
   - [Dashboard](#dashboard)
   - [Tile System](#tile-system)
   - [Outbound Order Management](#outbound-order-management)
+  - [Shipment Grouping](#shipment-grouping)
+  - [Pickup ETA & Pick Order](#pickup-eta--pick-order)
   - [Inbound Tracking](#inbound-tracking)
   - [Bin Usage Monitoring](#bin-usage-monitoring)
   - [Forecast Mode](#forecast-mode)
   - [Task List](#task-list)
+  - [3D Warehouse View](#3d-warehouse-view)
   - [Monitor Mode](#monitor-mode)
   - [Maintenance Panel](#maintenance-panel)
   - [Theming](#theming)
@@ -49,6 +52,7 @@ The tool is designed for daily use by logistics coordinators and inventory owner
 - Avoid over-committing staging space
 - Give all involved parties a shared and accurate picture of current warehouse status
 - Track outbound orders through their full lifecycle from picking to pickup
+- Group orders that ship together into trucks and pick them in the smartest order
 - Monitor inbound stock arrivals (expected and already received)
 - Log and analyze daily bin occupancy over time
 - Plan ahead using the Forecast mode to preview future capacity
@@ -113,9 +117,9 @@ Shows today's bin occupancy as a ratio against total configured bin count, with 
 Each occupied pallet slot on the floor map is rendered as an interactive tile containing:
 
 - **Customer abbreviation** — a short label identifying the customer
-- **Pallet index** — the position of this tile within the customer's group (e.g. `2/5`)
+- **Pallet index** — the position of this tile within the customer's group, shown as `2/5`
 - **Country-coded background** — fixed dark colors per destination country (IT, DE, FR, PL, ES, BE, DK, SE, LT, CH, QA, NL, AT, UK, and more)
-- **Customer-coded border** — dynamically assigned, unique color per customer, persisted across sessions
+- **Shipment-coded border** — a color assigned per shipment: orders that leave on the same truck share one border color, while separate shipments of the same customer get distinct colors so they read as separate on the floor (see [Shipment Grouping](#shipment-grouping))
 - **Status corner markers** — small symbols in the top-right corner of tiles indicating progress:
 
 | Symbol | Status |
@@ -125,7 +129,7 @@ Each occupied pallet slot on the floor map is rendered as an interactive tile co
 | `★` | Confirmed |
 
 **Hover Behavior**
-Hovering over any tile highlights the hovered customer's group, making it easy to identify which slots belong to the same shipment across a busy floor map.
+Hovering over any tile highlights the whole shipment it belongs to, making it easy to identify which slots leave on the same truck across a busy floor map.
 
 **Tile Detail Modal**
 Clicking or tapping any tile opens a full detail card showing all available order data: customer name, delivery date, picks, SORD number, destination country, forwarder, colli count, internal notes, and current status.
@@ -153,7 +157,37 @@ When an order is marked as Picked Up, it moves to the History view. The history 
 When an order is marked as **Picked Up**, it is automatically archived into a history collection, visible and manageable within the Maintenance Panel. Archived entries are retained for **365 days** before expiry.
 
 **Export Declaration Detection (EX1)**
-When a new outbound order is created with a non-EU destination country (e.g. CH, GB, SA), the system automatically detects this and asks whether the shipment's customs value or gross weight exceeds 1,000 (€ or kg). If confirmed, an EX1 customs checklist task is automatically created and linked to that order, ensuring the export document workflow is tracked without manual effort.
+When a new outbound order is created with a non-EU destination country such as CH, GB or SA, the system automatically detects this and asks whether the shipment's customs value or gross weight exceeds 1,000 (€ or kg). If confirmed, an EX1 customs checklist task is automatically created and linked to that order, ensuring the export document workflow is tracked without manual effort.
+
+---
+
+### Shipment Grouping
+
+Not every order from the same customer travels on the same truck — a later order might go out on a different day or with a different forwarder, and a truck only holds so many pallets. SPACE works this out automatically so orders are never wrongly lumped together:
+
+- Orders that share the **same customer, the same forwarder and the same delivery date** are treated as **one shipment** (one truck), up to a full load of roughly **33 pallets**. On the floor map and in the 3D view they share one border color and sit together, and in the sidebar they count as a single entry.
+- If the forwarder or the delivery date differs — or the truck is already full — the orders stay **separate**, each with its own color and its own pallet count.
+
+**String bridges.** In the Outbound table, a small graph down the left edge connects the rows that belong to the same shipment, drawn in that customer's color — so at a glance you can see which orders share a truck, even when their rows are far apart. The table itself always stays in the order things were entered; only the bridges show what belongs together.
+
+**Manual override.** If two orders happen to match but should still be handled separately, you can detach an order from its group and reattach it later (right-click on a customer name, or long-press on touch). The Undo button reverts grouping changes just like any other edit.
+
+---
+
+### Pickup ETA & Pick Order
+
+Two dates on an outbound order are easy to confuse, so SPACE keeps them apart:
+
+- **Delivered By** — the date the customer wants the goods.
+- **Pickup ETA** — the date the goods are expected to actually leave the warehouse and free up their staging slot.
+
+The Pickup ETA is estimated automatically from the destination country's transit time and the delivery deadline, so there is always a realistic "leaving" date without any manual calculation. Confirmed dates appear in green, still-estimated ones in orange.
+
+**Smart pick order.** Rather than simply sorting by delivery date, the Outbound sidebar and the Monitor board rank orders by how urgent they really are to pick — taking into account when each one has to leave, how much work is still open on it, and how tight the deadline is. The most time-critical orders always sit at the top.
+
+**ASAP.** An order can be flagged **ASAP** when there is no fixed delivery date and it should simply leave as soon as possible. ASAP orders get a boost and surface near the top of the pick order.
+
+**Manual priority.** An order can be pinned to **Priority 1, 2 or 3**, which always ranks it above the automatic order — a hard override for when something simply has to go first. A pinned priority is released automatically once the order reaches the Ordered stage.
 
 ---
 
@@ -235,6 +269,12 @@ When an order has open linked tasks, a yellow warning triangle appears next to t
 
 ---
 
+### 3D Warehouse View
+
+A **3D** button on the Floor Plan card opens an interactive three-dimensional model of the hall, showing the current pallet occupancy as colored stacks inside a scale model of the warehouse. You can orbit and look around the floor to get a spatial feel for how full the space is — handy on a large screen or when walking someone through the current layout. It uses the same colors as the flat floor map, so a shipment looks the same in both views.
+
+---
+
 ### Monitor Mode
 
 The Monitor button in the dashboard header is available exclusively to the **Warehouse Operator** role. Activating it switches the application into a fullscreen display layout intended for TV monitors in the warehouse.
@@ -259,10 +299,13 @@ The Maintenance Panel is accessible to **Maintainer** and **Customer Service** r
 **For Maintainers — full access:**
 - Fully editable table with inline editing for all order fields (customer, date, picks, SORD number, country, forwarder, colli, notes)
 - Checkbox columns: Printed, Picked, Controlled, Ordered, Confirmed, Picked Up — saved immediately on change
+- **Pickup ETA** column showing each order's estimated departure date, color-coded green (confirmed) or orange (estimated) — see [Pickup ETA & Pick Order](#pickup-eta--pick-order)
+- **String bridges** down the left edge connect the rows that ship together, in the customer's color (see [Shipment Grouping](#shipment-grouping))
+- Set or remove **ASAP** on an order's delivery date, and **detach or reattach** an order from its automatic shipment group — via right-click, or long-press on touch
 - Text field changes are batched and saved together via a **Save Changes** button
 - **Add Row** button to manually create a new blank order
 - **Delete** individual orders
-- **Undo** — reverts the last action (up to 10 steps)
+- **Undo** — reverts the last action (up to 10 steps), including ASAP and grouping changes
 - **History** — view and manage archived (picked-up) orders, with editable and color-coded pickup dates
 
 **For Customer Service — restricted access:**
@@ -310,7 +353,7 @@ PROMEDIA SPACE uses a **token-based access model** — there are no user account
 | **Viewer** | Dashboard only — read-only view of all live data |
 | **Customer Service** | Dashboard + Maintenance Panel (Outbound tab with restrictions, Inbound tab full access) — no Config, no Users, no Task List |
 | **Maintainer** | Dashboard + full Maintenance Panel (all tabs) + Task List + Printed badge + warning triangles |
-| **Warehouse Operator** | Dashboard only (read-only) + Monitor Mode |
+| **Warehouse Operator** | Dashboard (read-only) + Monitor Mode + can mark staged orders as picked up straight from the outbound list |
 
 Once a valid token is entered on the login screen, it is saved in the browser and automatically validated on subsequent visits. Logging out clears the saved token and role.
 
