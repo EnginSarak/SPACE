@@ -63,7 +63,7 @@ The tool is designed for daily use by logistics coordinators and inventory owner
 ## Preview
 
 <div align="center">
-  <img src="public/preview.png" alt="Promedia Space Dashboard Preview" width="100%"/>
+  <img src="https://raw.githubusercontent.com/enginsarak/space/main/public/preview.png?v=2" alt="Promedia Space Dashboard Preview" width="100%"/>
 </div>
 
 ---
