@@ -45,7 +45,7 @@
 
 ## Overview
 
-PROMEDIA SPACE is a closed-source, access-controlled internal web application built for Promedia's logistics operations. It provides a visual overview of the warehouse floor, showing which pallet staging slots are occupied, pending, or free.
+PROMEDIA SPACE is a closed-source, access-controlled internal web application built for Promedia's logistics operations. It provides a visual overview of the current warehouse state.
 
 The tool is designed for daily use by logistics coordinators and inventory owners to:
 
