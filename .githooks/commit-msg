@@ -1,0 +1,16 @@
+#!/bin/sh
+# Entfernt Claude-Attributions-Trailer aus jeder Commit-Message,
+# damit "Claude" nicht als Contributor im Repository auftaucht.
+# Es werden nur Claude/Anthropic-Zeilen entfernt; andere Co-Authors bleiben.
+
+msg_file="$1"
+tmp_file="$msg_file.declaudify"
+
+# Passende Trailer-Zeilen herausfiltern ...
+grep -viE '^(Co-authored-by:.*(claude|anthropic)|Claude-Session:)' "$msg_file" > "$tmp_file"
+
+# ... und evtl. entstandene doppelte/abschließende Leerzeilen zusammenfassen.
+cat -s "$tmp_file" > "$msg_file"
+rm -f "$tmp_file"
+
+exit 0
